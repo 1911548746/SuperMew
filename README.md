@@ -22,6 +22,8 @@ uv sync
 uv run python backend/app.py
 # 或
 uv run uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
+
+uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ```bash
@@ -111,6 +113,8 @@ docker compose logs -f standalone
 
 ```bash
 uv run uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
+
+uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 浏览器访问：
