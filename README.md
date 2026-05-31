@@ -484,13 +484,13 @@ StreamingResponse(
 
 ## 更新日志
 
-### 2026-04-08 本地嵌入与 BM25 持久化
+### 2026-05-31 本地嵌入与 BM25 持久化
 - **稠密向量**：由兼容 API 改为 `langchain_huggingface` 本地模型（默认 `BAAI/bge-m3`），支持 `EMBEDDING_MODEL` / `EMBEDDING_DEVICE`；Milvus `dense_embedding` 维度与 `DENSE_EMBEDDING_DIM` 对齐（默认 1024）。
 - **BM25 统计**：`词表 vocab + 文档频次 doc_freq + 文档数 N` 持久化至 `data/bm25_state.json`（可选 `BM25_STATE_PATH`）；每个叶子 chunk 视为一篇文档，入库时 **increment_add**，删除文档或覆盖上传前按文件名从 Milvus 拉取 chunk 文本后 **increment_remove**；`embedding_service` 在 `api` 与 `rag_utils` 间单例共享，避免写入与检索状态分裂。
 - **Milvus 查询**：单次 `query` 的 `limit` 受服务端窗口限制（如 16384），新增 **`query_all`** 分页拉取，供删除/覆盖前取回全文以同步 BM25；修复单次 `limit=100000` 导致的 RPC 报错。
 - **说明**：README「环境变量」「文档入库」「混合检索」「数据目录」等已同步为上述行为；`data/` 下 `bm25_state.json` 通常被 git 忽略，空库仅有 Milvus 无状态文件时需自行重建或重导。
 
-### 2026-03-21 后端服务建设升级（认证 + 数据库 + 缓存）
+### 2026-05-21 后端服务建设升级（认证 + 数据库 + 缓存）
 - 新增认证与权限模块：注册、登录、JWT、管理员权限控制。
 - 聊天历史从本地 JSON 迁移到 PostgreSQL，按用户隔离会话数据。
 - 父级分块存储从本地 JSON 迁移到 PostgreSQL。
@@ -499,14 +499,14 @@ StreamingResponse(
 - 文档管理接口收敛到管理员角色，避免普通用户误操作知识库。
 - 密码哈希方案升级为 PBKDF2-SHA256，兼容历史 bcrypt 校验。
 
-### 2026-03-13 三级分块与 Auto-merging 升级
+### 2026-05-19 三级分块与 Auto-merging 升级
 - 新增三级滑动窗口分块（L1/L2/L3），并为分块写入层级元数据。
 - 存储策略调整为 Leaf-only：仅 L3 叶子块写入 Milvus，L1/L2 写入本地 DocStore。
 - Auto-merging 改为从 DocStore 拉取父块，减少向量冗余存储。
 - 思考链路新增三级检索与自动合并步骤事件。
 - `rag_trace` 新增 `leaf_retrieve_level` 与 `auto_merge_*` 字段，且历史会话读取同样保留这些字段。
 
-### 2026-02-19 RAG 实时思考链路修复
+### 2026-05-13 RAG 实时思考链路修复
 - **问题**：Agent 在执行同步工具（如 `search_knowledge_base`）时，由于运行在线程池中，无法正确获取主线程的 asyncio 事件循环，导致 `emit_rag_step` 事件丢失，前端"思考中"气泡一直静止。
 - **修复**：
   1. **Backend (`tools.py`)**：在 `set_rag_step_queue` 中显式捕获主线程的 `loop`。
