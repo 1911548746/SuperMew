@@ -264,27 +264,49 @@
                 
                 <!-- Messages -->
                 <div v-for="(msg, index) in messages" :key="index" :class="['message', msg.isUser ? 'user-message' : 'bot-message']">
-                    <!-- 思考动画（在气泡内部，RAG 步骤实时填入） -->
-                    <div v-if="!msg.isUser && msg.isThinking && !msg.text" class="message-content thinking-content">
-                        <div class="thinking-header">
-                            <div class="thinking-dots">
-                                <span class="tdot"></span>
-                                <span class="tdot"></span>
-                                <span class="tdot"></span>
-                            </div>
-                            <span v-if="!msg.ragSteps || !msg.ragSteps.length" class="thinking-text">正在思考中...</span>
-                            <span v-else class="thinking-text">{{ msg.ragSteps[msg.ragSteps.length - 1].label }}</span>
-                        </div>
-                        <div v-if="msg.ragSteps && msg.ragSteps.length" class="thinking-trace-lines">
-                            <div v-for="(step, sIdx) in msg.ragSteps" :key="sIdx" class="thinking-trace-line">
-                                <span class="thinking-trace-icon">{{ step.icon || '▶' }}</span>
-                                <span class="thinking-trace-label">{{ step.label }}</span>
-                                <span v-if="step.detail" class="thinking-trace-detail">{{ step.detail }}</span>
-                            </div>
-                        </div>
-                    </div>
                     <!-- 正常回复内容 -->
-                    <div v-else class="message-content" v-html="msg.isUser ? escapeHtml(msg.text) : parseMarkdown(msg.text)"></div>
+                    <div v-if="msg.isUser" class="message-content" v-html="escapeHtml(msg.text)"></div>
+                    <!-- 思考动画（在气泡内部，RAG 步骤实时填入） -->
+                    <div v-else class="message-content" :class="{ 'thinking-content': msg.isThinking && !msg.text }">
+                        <template v-if="msg.isThinking && !msg.text">
+                            <div class="thinking-header">
+                                <div class="thinking-dots">
+                                    <span class="tdot"></span>
+                                    <span class="tdot"></span>
+                                    <span class="tdot"></span>
+                                </div>
+                                <span v-if="!msg.ragSteps || !msg.ragSteps.length" class="thinking-text">正在思考中...</span>
+                                <span v-else class="thinking-text">{{ msg.ragSteps[msg.ragSteps.length - 1].label }}</span>
+                            </div>
+                            <div v-if="msg.ragSteps && msg.ragSteps.length" class="thinking-trace-lines">
+                                <div v-for="(step, sIdx) in msg.ragSteps" :key="sIdx" class="thinking-trace-line">
+                                    <span class="thinking-trace-icon">{{ step.icon || '▶' }}</span>
+                                    <span class="thinking-trace-label">{{ step.label }}</span>
+                                    <span v-if="step.detail" class="thinking-trace-detail">{{ step.detail }}</span>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div v-if="isLoading && index === messages.length - 1 && msg.ragSteps && msg.ragSteps.length" class="live-rag-panel">
+                                <div class="thinking-header">
+                                    <div class="thinking-dots">
+                                        <span class="tdot"></span>
+                                        <span class="tdot"></span>
+                                        <span class="tdot"></span>
+                                    </div>
+                                    <span class="thinking-text">{{ msg.ragSteps[msg.ragSteps.length - 1].label }}</span>
+                                </div>
+                                <div class="thinking-trace-lines">
+                                    <div v-for="(step, sIdx) in msg.ragSteps" :key="sIdx" class="thinking-trace-line">
+                                        <span class="thinking-trace-icon">{{ step.icon || '▶' }}</span>
+                                        <span class="thinking-trace-label">{{ step.label }}</span>
+                                        <span v-if="step.detail" class="thinking-trace-detail">{{ step.detail }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="msg.text" v-html="parseMarkdown(msg.text)"></div>
+                        </template>
+                    </div>
                     <div v-if="!msg.isUser && msg.ragTrace" class="message-meta">
                         <details class="reasoning-details">
                             <summary>检索过程</summary>
