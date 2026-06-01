@@ -1,10 +1,10 @@
-"""Milvus 客户端 - 支持密集向量+稀疏向量混合检索"""
+"""Milvus 客户端 - 支持密集向量 + Milvus 2.6 内置 BM25 混合检索"""
 import os
 import threading
 from typing import Callable, TypeVar
 
 from dotenv import load_dotenv
-from pymilvus import MilvusClient, DataType, AnnSearchRequest, RRFRanker
+from pymilvus import MilvusClient, DataType, AnnSearchRequest, RRFRanker, Function, FunctionType
 
 load_dotenv()
 
@@ -14,7 +14,7 @@ T = TypeVar("T")
 
 
 class MilvusManager:
-    """Milvus 连接和集合管理 - 支持混合检索"""
+    """Milvus 连接和集合管理 - 支持 dense + BM25 Function 混合检索"""
 
     def __init__(self):
         self.host = os.getenv("MILVUS_HOST", "localhost")
@@ -67,64 +67,100 @@ class MilvusManager:
             self._reset_client(client)
             return operation(self._get_client())
 
+    def _ensure_collection_supports_bm25(self, client: MilvusClient) -> None:
+        description = client.describe_collection(self.collection_name)
+        functions = description.get("functions") or description.get("function") or []
+        function_text = str(functions).lower()
+        has_bm25_function = (
+            "text_bm25".lower() in function_text
+            or "bm25" in function_text
+        )
+        if has_bm25_function:
+            return
+
+        raise RuntimeError(
+            "当前 Milvus collection 不是 Milvus 2.6 BM25 Function schema。"
+            "请先备份需要的数据，然后删除/重建 collection 并重新上传文档。"
+        )
+
     def init_collection(self, dense_dim: int | None = None):
         """
-        初始化 Milvus 集合 - 同时支持密集向量和稀疏向量
+        初始化 Milvus 集合 - dense 向量由应用写入，BM25 sparse 向量由 Milvus Function 从 text 自动生成。
         :param dense_dim: 密集向量维度；默认读环境变量 DENSE_EMBEDDING_DIM（本地 BAAI/bge-m3 为 1024）
         """
         if dense_dim is None:
             dense_dim = int(os.getenv("DENSE_EMBEDDING_DIM", "1024"))
         def _init(client: MilvusClient) -> None:
-            if not client.has_collection(self.collection_name):
-                schema = client.create_schema(auto_id=True, enable_dynamic_field=True)
-                
-                # 主键
-                schema.add_field("id", DataType.INT64, is_primary=True, auto_id=True)
-                
-                # 密集向量（来自 embedding 模型）
-                schema.add_field("dense_embedding", DataType.FLOAT_VECTOR, dim=dense_dim)
-                
-                # 稀疏向量（来自 BM25）
-                schema.add_field("sparse_embedding", DataType.SPARSE_FLOAT_VECTOR)
-                
-                # 文本和元数据字段
-                schema.add_field("text", DataType.VARCHAR, max_length=2000)
-                schema.add_field("filename", DataType.VARCHAR, max_length=255)
-                schema.add_field("file_type", DataType.VARCHAR, max_length=50)
-                schema.add_field("file_path", DataType.VARCHAR, max_length=1024)
-                schema.add_field("page_number", DataType.INT64)
-                schema.add_field("chunk_idx", DataType.INT64)
+            if client.has_collection(self.collection_name):
+                self._ensure_collection_supports_bm25(client)
+                return
 
-                # Auto-merging 所需层级字段
-                schema.add_field("chunk_id", DataType.VARCHAR, max_length=512)
-                schema.add_field("parent_chunk_id", DataType.VARCHAR, max_length=512)
-                schema.add_field("root_chunk_id", DataType.VARCHAR, max_length=512)
-                schema.add_field("chunk_level", DataType.INT64)
+            schema = client.create_schema(auto_id=True, enable_dynamic_field=True)
 
-                # 为两种向量分别创建索引
-                index_params = client.prepare_index_params()
-                
-                # 密集向量索引 - 使用 HNSW（更适合混合检索）
-                index_params.add_index(
-                    field_name="dense_embedding",
-                    index_type="HNSW",
-                    metric_type="IP",
-                    params={"M": 16, "efConstruction": 256}
-                )
-                
-                # 稀疏向量索引
-                index_params.add_index(
-                    field_name="sparse_embedding",
-                    index_type="SPARSE_INVERTED_INDEX",
-                    metric_type="IP",
-                    params={"drop_ratio_build": 0.2}
-                )
+            # 主键
+            schema.add_field("id", DataType.INT64, is_primary=True, auto_id=True)
 
-                client.create_collection(
-                    collection_name=self.collection_name,
-                    schema=schema,
-                    index_params=index_params
-                )
+            # 密集向量（来自本地 embedding 模型）
+            schema.add_field("dense_embedding", DataType.FLOAT_VECTOR, dim=dense_dim)
+
+            # 稀疏向量字段由 BM25 Function 输出，插入数据时不需要手动传 sparse_embedding。
+            schema.add_field("sparse_embedding", DataType.SPARSE_FLOAT_VECTOR)
+
+            # text 必须开启 analyzer，Milvus 才能基于它执行 BM25 分词和统计。
+            schema.add_field(
+                "text",
+                DataType.VARCHAR,
+                max_length=8192,
+                enable_analyzer=True,
+            )
+            schema.add_field("filename", DataType.VARCHAR, max_length=255)
+            schema.add_field("file_type", DataType.VARCHAR, max_length=50)
+            schema.add_field("file_path", DataType.VARCHAR, max_length=1024)
+            schema.add_field("page_number", DataType.INT64)
+            schema.add_field("chunk_idx", DataType.INT64)
+
+            # Auto-merging 所需层级字段
+            schema.add_field("chunk_id", DataType.VARCHAR, max_length=512)
+            schema.add_field("parent_chunk_id", DataType.VARCHAR, max_length=512)
+            schema.add_field("root_chunk_id", DataType.VARCHAR, max_length=512)
+            schema.add_field("chunk_level", DataType.INT64)
+
+            bm25_function = Function(
+                name="text_bm25",
+                function_type=FunctionType.BM25,
+                input_field_names=["text"],
+                output_field_names=["sparse_embedding"],
+            )
+            schema.add_function(bm25_function)
+
+            # 为两种向量分别创建索引
+            index_params = client.prepare_index_params()
+
+            # 密集向量索引 - 使用 HNSW（更适合混合检索）
+            index_params.add_index(
+                field_name="dense_embedding",
+                index_type="HNSW",
+                metric_type="IP",
+                params={"M": 16, "efConstruction": 256}
+            )
+
+            # 稀疏向量索引 - 数据由 BM25 Function 自动写入
+            index_params.add_index(
+                field_name="sparse_embedding",
+                index_type="SPARSE_INVERTED_INDEX",
+                metric_type="BM25",
+                params={
+                    "inverted_index_algo": "DAAT_MAXSCORE",
+                    "bm25_k1": 1.2,
+                    "bm25_b": 0.75,
+                }
+            )
+
+            client.create_collection(
+                collection_name=self.collection_name,
+                schema=schema,
+                index_params=index_params
+            )
 
         self._run_with_reconnect(_init)
 
@@ -199,7 +235,7 @@ class MilvusManager:
     def hybrid_retrieve(
         self,
         dense_embedding: list[float],
-        sparse_embedding: dict,
+        query_text: str,
         top_k: int = 5,
         rrf_k: int = 60,     #可调节
         filter_expr: str = "",
@@ -208,7 +244,7 @@ class MilvusManager:
         混合检索 - 使用 RRF 融合密集向量和稀疏向量的检索结果
         
         :param dense_embedding: 密集向量
-        :param sparse_embedding: 稀疏向量 {index: value, ...}
+        :param query_text: 原始查询文本；Milvus 会用 BM25 Function 转成 sparse 查询向量
         :param top_k: 返回结果数量
         :param rrf_k: RRF 算法参数 k，默认60
         :return: 检索结果列表
@@ -236,9 +272,9 @@ class MilvusManager:
         
         # 稀疏向量搜索请求
         sparse_search = AnnSearchRequest(
-            data=[sparse_embedding],
+            data=[query_text],
             anns_field="sparse_embedding",
-            param={"metric_type": "IP", "params": {"drop_ratio_search": 0.2}},
+            param={"metric_type": "BM25", "params": {"drop_ratio_search": 0.2}},
             limit=top_k * 2,
             expr=filter_expr,
         )

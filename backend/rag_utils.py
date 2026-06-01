@@ -22,7 +22,7 @@ AUTO_MERGE_ENABLED = os.getenv("AUTO_MERGE_ENABLED", "true").lower() != "false"
 AUTO_MERGE_THRESHOLD = int(os.getenv("AUTO_MERGE_THRESHOLD", "2"))
 LEAF_RETRIEVE_LEVEL = int(os.getenv("LEAF_RETRIEVE_LEVEL", "3"))
 
-# 全局初始化检索依赖（与 api 共用 embedding_service，保证 BM25 状态一致）
+# 全局初始化检索依赖
 _milvus_manager = MilvusManager()
 _parent_chunk_store = ParentChunkStore()
 
@@ -248,11 +248,10 @@ def retrieve_documents(query: str, top_k: int = 5) -> Dict[str, Any]:
     try:
         dense_embeddings = _embedding_service.get_embeddings([query])
         dense_embedding = dense_embeddings[0]
-        sparse_embedding = _embedding_service.get_sparse_embedding(query)
 
         retrieved = _milvus_manager.hybrid_retrieve(
             dense_embedding=dense_embedding,
-            sparse_embedding=sparse_embedding,
+            query_text=query,
             top_k=candidate_k,
             filter_expr=filter_expr,
         )

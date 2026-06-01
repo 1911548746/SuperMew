@@ -50,16 +50,6 @@ milvus_writer = MilvusWriter(embedding_service=embedding_service, milvus_manager
 router = APIRouter()
 
 
-def _remove_bm25_stats_for_filename(filename: str) -> None:
-    """删除 Milvus 中该文件对应 chunk 前，先从持久化 BM25 统计中扣减。"""
-    rows = milvus_manager.query_all(
-        filter_expr=f'filename == "{filename}"',
-        output_fields=["text"],
-    )
-    texts = [r.get("text") or "" for r in rows]
-    embedding_service.increment_remove_documents(texts)
-
-
 @router.post("/auth/register", response_model=AuthResponse)
 async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     username = (request.username or "").strip()
@@ -218,10 +208,6 @@ def _process_upload_job(job_id: str, file_path: str, filename: str) -> None:
         milvus_manager.init_collection()
         delete_expr = f'filename == "{filename}"'
         try:
-            _remove_bm25_stats_for_filename(filename)
-        except Exception:
-            pass
-        try:
             milvus_manager.delete(delete_expr)
         except Exception:
             pass
@@ -293,13 +279,8 @@ def _process_delete_job(job_id: str, filename: str) -> None:
         delete_expr = f'filename == "{filename}"'
         delete_job_manager.complete_step(job_id, "prepare", "删除任务已创建")
 
-        failed_step = "bm25"
-        delete_job_manager.update_step(job_id, "bm25", 20, "running", "正在同步 BM25 统计")
-        _remove_bm25_stats_for_filename(filename)
-        delete_job_manager.complete_step(job_id, "bm25", "BM25 统计已同步")
-
         failed_step = "milvus"
-        delete_job_manager.update_step(job_id, "milvus", 30, "running", "正在删除 Milvus 向量数据")
+        delete_job_manager.update_step(job_id, "milvus", 50, "running", "正在删除 Milvus 向量数据")
         result = milvus_manager.delete(delete_expr)
         deleted_count = result.get("delete_count", 0) if isinstance(result, dict) else 0
         delete_job_manager.complete_step(job_id, "milvus", f"向量数据已删除：{deleted_count} 条")
@@ -442,10 +423,6 @@ async def upload_document(file: UploadFile = File(...), _: User = Depends(requir
 
         delete_expr = f'filename == "{filename}"'
         try:
-            _remove_bm25_stats_for_filename(filename)
-        except Exception:
-            pass
-        try:
             milvus_manager.delete(delete_expr)
         except Exception:
             pass
@@ -496,7 +473,6 @@ async def delete_document(filename: str, _: User = Depends(require_admin)):
         milvus_manager.init_collection()
 
         delete_expr = f'filename == "{filename}"'
-        _remove_bm25_stats_for_filename(filename)
         result = milvus_manager.delete(delete_expr)
         parent_chunk_store.delete_by_filename(filename)
 
