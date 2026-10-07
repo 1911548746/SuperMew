@@ -377,6 +377,143 @@ body {
     line-height: 1.5;
 }
 
+.trace-funnel {
+    color: var(--text-muted, #6b7280);
+    font-size: 0.92em;
+}
+
+/* 复杂度路由样式 */
+.trace-complexity {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tag-simple,
+.tag-complex {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.tag-simple {
+    background-color: #d3f9d8;
+    color: #2b8a3e;
+}
+
+.tag-complex {
+    background-color: #ffe3e3;
+    color: #c92a2a;
+}
+
+.trace-detail {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.trace-sub-questions {
+    margin-top: 4px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.trace-sub-qs-header {
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+    color: var(--text-color);
+}
+
+.trace-sub-qs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.trace-sub-q-item {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.trace-sub-q-index {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-right: 4px;
+}
+
+/* 子 Agent 检索详情 */
+.trace-sub-traces {
+    margin-top: 8px;
+}
+
+.sub-traces-details {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sub-traces-title {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--primary-color);
+    padding: 6px 10px;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.sub-traces-title::-webkit-details-marker {
+    display: none;
+}
+
+.sub-traces-title::before {
+    content: '▶';
+    display: inline-block;
+    margin-right: 4px;
+    transition: transform 0.2s ease;
+    font-size: 0.7rem;
+}
+
+.sub-traces-details[open] .sub-traces-title::before {
+    transform: rotate(90deg);
+}
+
+.sub-trace-block {
+    padding: 8px 10px;
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.sub-trace-block:last-child {
+    border-bottom: none;
+}
+
+.sub-trace-header {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+}
+
+.sub-trace-chunks {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-top: 2px;
+}
+
 .sources {
     margin-top: 10px;
 }
@@ -471,6 +608,74 @@ body {
     margin-bottom: 10px;
 }
 
+.hitl-panel {
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border: 1px solid #f5c16c;
+    border-left-width: 4px;
+    border-radius: 8px;
+    background: #fffaf0;
+    color: var(--text-color);
+}
+
+.hitl-panel-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #9a5b00;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.hitl-panel-prompt {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.hitl-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.hitl-option {
+    border: 1px solid #e0b15f;
+    background: #ffffff;
+    color: #6c4800;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: var(--transition);
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.hitl-option:hover {
+    border-color: #bd7d00;
+    background: #fff3cf;
+}
+
+.hitl-resume-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    margin-bottom: 6px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: #fffaf0;
+    color: #8a5a00;
+    border: 1px solid #f5d79a;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
 /* Input Area */
 .input-area-wrapper {
     padding: 20px 30px;
@@ -495,6 +700,11 @@ body {
     box-shadow: 0 4px 15px rgba(255, 183, 178, 0.15);
 }
 
+.input-area.hitl-active {
+    border-color: #f5c16c;
+    background-color: #fffaf0;
+}
+
 .attach-btn {
     background: none;
     border: none;
@@ -507,6 +717,12 @@ body {
 
 .attach-btn:hover {
     color: var(--primary-color);
+}
+
+.attach-btn:disabled,
+textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
 }
 
 textarea {
@@ -540,6 +756,19 @@ textarea {
 .send-btn:hover {
     transform: scale(1.1) rotate(-10deg);
     background-color: #ff8e89;
+}
+
+.send-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    transform: none;
+    background-color: var(--text-light);
+    box-shadow: none;
+}
+
+.send-btn:disabled:hover {
+    transform: none;
+    background-color: var(--text-light);
 }
 
 .footer-text {
@@ -732,6 +961,52 @@ textarea {
     white-space: nowrap;
 }
 
+/* References */
+.references-section {
+    margin-top: 10px;
+    padding: 12px 16px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-color);
+    font-size: 0.85rem;
+}
+
+.references-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.references-list {
+    margin-top: 10px;
+}
+
+sup.cite-ref,
+span.cite-ref {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin: 0 2px;
+    cursor: pointer;
+}
+
+sup.cite-ref:hover,
+span.cite-ref:hover {
+    color: #ff6b6b;
+    text-decoration: underline;
+}
+
+@keyframes highlightFade {
+    0% { background-color: rgba(255, 158, 153, 0.4); border-color: var(--primary-color); }
+    100% { background-color: rgba(255, 255, 255, 0.6); border-color: rgba(0, 0, 0, 0.03); }
+}
+
+.highlight-chunk {
+    animation: highlightFade 2s ease-out forwards !important;
+}
+
 .session-meta {
     display: flex;
     justify-content: space-between;
@@ -741,6 +1016,15 @@ textarea {
 
 .history-item.active .session-meta {
     color: rgba(255, 255, 255, 0.8);
+}
+
+.session-status {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.history-item.active .session-status {
+    color: var(--white);
 }
 
 .session-body {
@@ -1228,6 +1512,20 @@ textarea {
     font-size: 0.88rem;
 }
 
+.thinking-elapsed {
+    margin-left: auto;
+    color: var(--text-light, #999);
+    font-size: 0.76rem;
+    white-space: nowrap;
+}
+
+.thinking-hint {
+    color: var(--text-light, #888);
+    font-size: 0.8rem;
+    line-height: 1.45;
+    padding-left: 27px;
+}
+
 /* Thinking trace lines — RAG progress inside thinking bubble */
 .thinking-trace-lines {
     display: flex;
@@ -1265,6 +1563,71 @@ textarea {
     color: var(--text-light, #999);
     font-size: 0.8rem;
     margin-left: 2px;
+}
+
+.thinking-trace-time {
+    margin-left: auto;
+    color: var(--text-light, #aaa);
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+/* 子 Agent 步骤分组 */
+.step-group {
+    margin: 2px 0;
+}
+
+.step-group-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+    user-select: none;
+}
+
+.step-group-header:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.step-group-arrow {
+    font-size: 0.65rem;
+    color: var(--primary-color);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.step-group-arrow.collapsed {
+    transform: rotate(0deg);
+}
+
+.step-group-arrow:not(.collapsed) {
+    transform: rotate(90deg);
+}
+
+.step-group-label {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+}
+
+.step-group-count {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.step-group-body {
+    padding-left: 16px;
+    border-left: 2px solid var(--primary-light, #ffb7b2);
+    margin-left: 8px;
 }
 
 /* Real-time RAG steps */

@@ -2,8 +2,6 @@
 
 Agent的项目记录，方便后续持续更新与展示。
 
-[![zread](https://img.shields.io/badge/Ask_Zread-_.svg?style=flat&color=00b0aa&labelColor=000000&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQuOTYxNTYgMS42MDAxSDIuMjQxNTZDMS44ODgxIDEuNjAwMSAxLjYwMTU2IDEuODg2NjQgMS42MDE1NiAyLjI0MDFWNC45NjAxQzEuNjAxNTYgNS4zMTM1NiAxLjg4ODEgNS42MDAxIDIuMjQxNTYgNS42MDAxSDQuOTYxNTZDNS4zMTUwMiA1LjYwMDEgNS42MDE1NiA1LjMxMzU2IDUuNjAxNTYgNC45NjAxVjIuMjQwMUM1LjYwMTU2IDEuODg2NjQgNS4zMTUwMiAxLjYwMDEgNC45NjE1NiAxLjYwMDFaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik00Ljk2MTU2IDEwLjM5OTlIMi4yNDE1NkMxLjg4ODEgMTAuMzk5OSAxLjYwMTU2IDEwLjY4NjQgMS42MDE1NiAxMS4wMzk5VjEzLjc1OTlDMS42MDE1NiAxNC4xMTM0IDEuODg4MSAxNC4zOTk5IDIuMjQxNTYgMTQuMzk5OUg0Ljk2MTU2QzUuMzE1MDIgMTQuMzk5OSA1LjYwMTU2IDE0LjExMzQgNS42MDE1NiAxMy43NTk5VjExLjAzOTlDNS42MDE1NiAxMC42ODY0IDUuMzE1MDIgMTAuMzk5OSA0Ljk2MTU2IDEwLjM5OTlaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik0xMy43NTg0IDEuNjAwMUgxMS4wMzg0QzEwLjY4NSAxLjYwMDEgMTAuMzk4NCAxLjg4NjY0IDEwLjM5ODQgMi4yNDAxVjQuOTYwMUMxMC4zOTg0IDUuMzEzNTYgMTAuNjg1IDUuNjAwMSAxMS4wMzg0IDUuNjAwMUgxMy43NTg0QzE0LjExMTkgNS42MDAxIDE0LjM5ODQgNS4zMTM1NiAxNC4zOTg0IDQuOTYwMVYyLjI0MDFDMTQuMzk4NCAxLjg4NjY0IDE0LjExMTkgMS42MDAxIDEzLjc1ODQgMS42MDAxWiIgZmlsbD0iI2ZmZiIvPgo8cGF0aCBkPSJNNCAxMkwxMiA0TDQgMTJaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik00IDEyTDEyIDQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K&logoColor=ffffff)](https://zread.ai/icey1287/SuperMew)
-
 ## 本地部署
 
 ### 1) 环境准备
@@ -22,8 +20,6 @@ uv sync
 uv run python backend/app.py
 # 或
 uv run uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
-
-uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ```bash
@@ -40,48 +36,12 @@ uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### 3) 创建 `.env` 文件
-在项目根目录新建 `.env`，可直接使用下面模板：
 
-```env
-# ===== Model =====
-ARK_API_KEY=your_ark_api_key
-MODEL=your_model_name
-BASE_URL=https://your-llm-endpoint/v1
-
-# ===== 本地稠密向量（langchain_huggingface，默认 BAAI/bge-m3）=====
-EMBEDDING_MODEL=BAAI/bge-m3
-EMBEDDING_DEVICE=cpu
-DENSE_EMBEDDING_DIM=1024
-
-# ===== Rerank (可选，不配则自动降级) =====
-RERANK_MODEL=your_rerank_model
-RERANK_BINDING_HOST=https://your-rerank-host
-RERANK_API_KEY=your_rerank_api_key
-
-# ===== Milvus =====
-MILVUS_HOST=127.0.0.1
-MILVUS_PORT=19530
-MILVUS_COLLECTION=embeddings_collection
-
-# ===== Database / Cache =====
-DATABASE_URL=postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/langchain_app
-REDIS_URL=redis://127.0.0.1:6379/0
-
-# ===== Auth =====
-JWT_SECRET_KEY=replace-with-strong-random-secret
-ADMIN_INVITE_CODE=supermew-admin-2026
-JWT_ALGORITHM=HS256
-JWT_EXPIRE_MINUTES=1440
-PASSWORD_PBKDF2_ROUNDS=310000
-
-# ===== BM25 稀疏向量 =====
-# 由 Milvus 2.6 BM25 Function 基于 text 字段自动生成，无需本地 bm25_state.json
-
-# ===== Tools （可选）=====
-AMAP_WEATHER_API=https://restapi.amap.com/v3/weather/weatherInfo
-AMAP_API_KEY=your_amap_api_key
-
+```bash
+cp .env.example .env
 ```
+
+按需编辑 `.env` 中的 API Key、模型名与连接地址；变量说明见 `.env.example` 内注释。
 
 ### 4) Docker 部署（数据库 + 缓存 + 向量库）
 当前仓库的 `docker-compose.yml` 同时承载业务依赖与 Milvus 依赖：
@@ -108,18 +68,48 @@ docker compose logs -f standalone
 - MinIO Console：`9001`
 - Attu：`8080`
 
-### 5) 启动应用并访问
-在 Milvus 启动后，运行后端应用：
+### 5) 编译前端代码（首次运行及修改后必做）
+首次运行或前端代码修改后，需要进行前端依赖安装和构建编译，以生成供后端托管的 `frontend/dist` 目录：
 
 ```bash
-uv run uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
+cd frontend
 
-uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+# 安装前端依赖
+npm install
+
+# 编译构建静态包
+npm run build
+```
+
+编译完成后，构建产物会自动保存在 `frontend/dist/` 中，后端启动时会自动挂载此目录。
+
+### 6) 启动应用并访问
+在 Milvus 启动且前端编译完成后，返回项目根目录并运行后端应用：
+
+```bash
+# 若当前处于 frontend 目录下，先返回项目根目录
+cd ..
+
+# 运行后端应用
+uv run uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 浏览器访问：
-- 前端页面：`http://127.0.0.1:8000/`
+- 前端页面：`http://127.0.0.1:8000/` （后端静态托管编译后的 `frontend/dist` 资源）
 - API 文档：`http://127.0.0.1:8000/docs`
+
+### 7) 前端开发与调试（可选）
+前端基于 Vite + Vue 3 开发。若需要进行前端代码开发与调试：
+
+```bash
+cd frontend
+
+# 1. 启动本地开发服务（运行于 http://localhost:3000，内置反向代理至 FastAPI 后端 8000 端口）
+npm run dev
+
+# 2. 编译生产包（构建结果将输出至 frontend/dist/ 目录中，供后端静态托管）
+npm run build
+```
 
 ## 项目概览
 - **核心能力**：
@@ -137,8 +127,8 @@ uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 - **实时 RAG 过程可视化**：检索过程在模型"思考中"阶段就开始展示，通过 `asyncio.Queue` + 后台任务架构实现工具执行期间的实时推送。
 - **回答终止功能**：前端 `AbortController` + 后端 `StreamingResponse` 支持用户随时中断正在生成的回答。
 - **会话摘要记忆**：自动摘要旧消息并注入系统提示，维持上下文且控制 token。
-- **文档处理链路**：上传 → 切分 → 应用生成稠密向量 → Milvus 基于 `text` 自动生成 BM25 稀疏向量并入库，支持重复上传自动清理旧 chunk。
-- **Milvus 内置 BM25**：基于 Milvus 2.6 BM25 Function 维护词表、文档频次与 IDF，应用层不再维护 `bm25_state.json`。
+- **文档处理链路**：上传 → 切分 → 稠密/稀疏向量同步生成 → Milvus 入库，支持重复上传自动清理旧 chunk。
+- **BM25 统计持久化**：`词表 + 文档频次 df + 文档数 N` 落盘到 `data/bm25_state.json`，入库时增量增加、删除/覆盖上传前按文件名从 Milvus 拉取 chunk 文本后增量扣减，与向量库同步；`embedding_service` 在 API 与检索模块间单例共享。
 - **三级分块 + Auto-merging**：L1/L2/L3 三层滑窗切分；检索时优先召回 L3，满足阈值后自动合并到父块（L3->L2->L1）。
 - **Leaf-only 向量化存储**：仅叶子分块写入 Milvus，父块写入 DocStore，减少向量冗余并保留上下文聚合能力。
 - **工具可扩展**：天气查询示例 + 知识库检索，便于按需增添第三方 API 或企业数据源。
@@ -214,24 +204,37 @@ uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 - 登录校验兼容历史 bcrypt 哈希，支持平滑迁移。
 
 ## 目录与架构
-- 后端：`backend/`
+- 后端：`backend/`（分层包结构，统一 `from backend.xxx import`）
   - [app.py](backend/app.py)：FastAPI 入口、CORS、静态资源挂载。
-  - [api.py](backend/api.py)：聊天、会话管理、文档管理接口。
-  - [auth.py](backend/auth.py)：注册登录、JWT 鉴权、权限检查、密码哈希与校验。
-  - [database.py](backend/database.py)：数据库引擎与会话工厂、建表入口。
-  - [models.py](backend/models.py)：ORM 模型定义（用户、会话、消息、父文档）。
-  - [cache.py](backend/cache.py)：Redis JSON 缓存封装。
-  - [agent.py](backend/agent.py)：LangChain Agent、会话存储、摘要逻辑。
-  - [tools.py](backend/tools.py)：天气查询、知识库检索工具。
-  - [embedding.py](backend/embedding.py)：本地 HuggingFace 稠密向量（默认 `BAAI/bge-m3`）。
-  - [document_loader.py](backend/document_loader.py)：PDF/Word 加载与分片。
-  - [parent_chunk_store.py](backend/parent_chunk_store.py)：父级分块仓储（PostgreSQL + Redis，用于 Auto-merging 回取父块）。
-  - [milvus_writer.py](backend/milvus_writer.py)：向量写入（应用写 dense，Milvus 自动生成 BM25 sparse）。
-  - [milvus_client.py](backend/milvus_client.py)：Milvus 集合定义、BM25 Function、混合检索；`query_all` 分页查询。
-  - [schemas.py](backend/schemas.py)：Pydantic 请求/响应模型。
+  - `api/`：HTTP 层
+    - [router.py](backend/api/router.py)：路由聚合。
+    - `routes/`：`auth`、`sessions`、`chat`、`documents` 分文件。
+    - [resources.py](backend/api/resources.py)：Milvus / 上传目录等共享资源。
+  - `chat/`：对话域
+    - [service.py](backend/chat/service.py)：非流式 / 流式聊天入口。
+    - [runtime.py](backend/chat/runtime.py)：LangChain Agent 实例。
+    - [storage.py](backend/chat/storage.py)：会话 PostgreSQL + Redis。
+    - [streaming.py](backend/chat/streaming.py)：RAG 步骤 SSE 推送（非 Agent 工具，供 pipeline 跨线程上报进度）。
+    - [rag_context.py](backend/chat/rag_context.py)：单轮 RAG trace 暂存（工具 → 会话持久化）。
+  - `rag/`：检索增强
+    - [pipeline.py](backend/rag/pipeline.py)：LangGraph RAG 工作流。
+    - [utils.py](backend/rag/utils.py)：混合检索、Rerank、Auto-merging。
+  - `indexing/`：文档入库与向量
+    - [embedding.py](backend/indexing/embedding.py)：稠密 + BM25 稀疏向量。
+    - [document_loader.py](backend/indexing/document_loader.py)：PDF/Word/Excel 分块。
+    - [milvus_client.py](backend/indexing/milvus_client.py)、[milvus_writer.py](backend/indexing/milvus_writer.py)。
+    - [parent_chunk_store.py](backend/indexing/parent_chunk_store.py)：父级分块 DocStore。
+  - `tools/`：LangChain Agent 可调用的 `@tool`（天气、知识库检索）。
+  - `infra/`：[database.py](backend/infra/database.py)、[cache.py](backend/infra/cache.py)、[auth.py](backend/infra/auth.py)。
+  - `db/`：[models.py](backend/db/models.py)：ORM 模型。
+  - `schemas/`：Pydantic 请求/响应（auth / chat / documents）。
+  - `jobs/`：[upload_jobs.py](backend/jobs/upload_jobs.py)：异步上传/删除任务进度。
 - 前端：`frontend/`
-  - [index.html](frontend/index.html) + [script.js](frontend/script.js) + [style.css](frontend/style.css)：Vue 3 + marked + highlight.js，提供聊天、历史会话、文档上传/删除界面。
+  - 采用现代工程化设计（Vite + Vue 3 + TypeScript + Pinia + Axios + Sass）。
+  - 在 `frontend/` 目录下运行 `npm run dev` 即可开始开发联调（运行于 http://localhost:3000）。
+  - 在 `frontend/` 目录下运行 `npm run build` 会生成生产环境编译产物输出至 `frontend/dist/`，供 FastAPI 后端无缝进行静态托管。
 - 数据：`data/`
+  - `bm25_state.json`：BM25 词表与 `doc_freq` / `total_docs` 等统计（稀疏检索 IDF 与入库、删除同步）。
   - `documents/`：上传文档原文件。
 - 向量库：Milvus（可由 `docker-compose` 或自建服务提供）。
 
@@ -239,7 +242,7 @@ uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 ### 1) 项目全链路（端到端）
 1. 用户在前端输入问题，调用 `POST /chat/stream`（流式）。
-2. FastAPI `api.py` 返回 `StreamingResponse(media_type="text/event-stream")`。
+2. FastAPI `api/routes/chat.py` 返回 `StreamingResponse(media_type="text/event-stream")`。
 3. LangChain Agent 根据问题类型决定是否调用工具：
   - 天气问题 → `get_current_weather`
   - 知识问答 → `search_knowledge_base`
@@ -251,9 +254,9 @@ uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ### 2) RAG 全链路（重点）
 1. **初次召回**：`retrieve_initial`
   - 调用 `retrieve_documents`。
-  - 先按 `chunk_level == 3` 执行 Milvus Hybrid 检索（Dense + Sparse + RRF）。
-  - 取更大候选集后走 Jina Rerank 精排。
-  - 对召回叶子块执行 Auto-merging（L3->L2->L1），父块从 DocStore 读取。
+  - 先按 `chunk_level == 3` 执行 Milvus Hybrid 检索（Dense + Sparse + RRF），候选池大小由 `RETRIEVAL_CANDIDATE_K` 或 `RETRIEVAL_CANDIDATE_MULTIPLIER` 决定。
+  - 在完整候选上对叶子块执行 Auto-merging（L3→L2→L1），父块从 DocStore 读取。
+  - 对合并后的片段走 Jina Rerank 精排并截断 `top_k`（流水线：`recall_merge_rerank`）。
 2. **相关性打分门控**：`grade_documents`
   - 使用结构化输出打分 `yes/no`。
   - `yes` 直接进入生成回答；`no` 进入重写阶段。
@@ -262,7 +265,7 @@ uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
   - 生成 `rewrite_query`、`step_back_question`、`hypothetical_doc` 等中间结果。
 4. **二次召回**：`retrieve_expanded`
   - 对重写后的查询（或 HyDE 文档）再次检索。
-  - 同样执行 L3 召回 + Auto-merging，结果去重后返回上下文。
+  - 同样执行 L3 召回 → Auto-merging → Rerank；多路结果按 `chunk_id` 去重（保留更高分）后返回上下文。
 5. **答案生成**：Agent 结合上下文生成最终回答。
 6. **可观测追踪**：返回 `rag_trace`，包括
   - 评分结果与路由决策
@@ -273,16 +276,16 @@ uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 ### 3) 文档入库链路
 1. 前端上传 PDF/Word 到 `POST /documents/upload`。
-2. 若同名文件已存在：删除旧向量与父块缓存；BM25 统计由 Milvus collection 内部随数据变更维护。
+2. 若同名文件已存在：先从 Milvus **分页查询**该文件全部叶子 chunk 的 `text`，对 BM25 统计执行 **increment_remove**，再删除旧向量与父块缓存，避免统计与库不一致。
 3. `document_loader.py` 执行三级滑动窗口分块并写入层级元数据（chunk_id / parent_chunk_id / root_chunk_id / chunk_level）。
 4. L1/L2 父级分块写入 `parent_chunk_store.py`（DocStore）。
-5. L3 叶子分块在 `milvus_writer` 中生成 Dense 向量并连同 `text` 写入 Milvus；Milvus BM25 Function 自动从 `text` 生成 `sparse_embedding`。
+5. L3 叶子分块在 `milvus_writer` 中先对本轮 chunk 文本执行 BM25 **increment_add**（更新 `N`、`df`、总长度并写回 `bm25_state.json`），再经 `embedding.py` 生成 Dense 与 Sparse 向量并写入 Milvus。
 6. 后续检索可直接利用新文档参与召回。
 
-### 4) Milvus BM25 Function
-- `milvus_client.py` 在 collection schema 中声明 `text -> sparse_embedding` 的 BM25 Function。
-- `text` 字段开启 analyzer；`sparse_embedding` 字段使用 `SPARSE_INVERTED_INDEX + BM25`。
-- 应用层不再维护词表、`doc_freq`、`total_docs`、平均文档长度，也不再生成 query sparse dict。
+### 4) BM25 状态文件（`data/bm25_state.json`）
+- **内容**：`version`、全局 `total_docs`（chunk 篇数）、`sum_token_len`、`vocab`（词 → 稀疏维度下标）、`doc_freq`（词 → 文档频次，用于 IDF）。`vocab` 与 `doc_freq` 职责不同：前者定 Milvus 稀疏向量维度，后者定 BM25 统计。
+- **增量**：每入库一批叶子 chunk 增加统计；删除文档或覆盖上传前按文件名扣减。词表下标不回收，避免与历史稀疏向量维度冲突。
+- **注意**：`data/` 默认被 `.gitignore` 忽略，状态文件通常不落库；若 Milvus 已有数据但状态文件缺失，需清空重导或自行重建统计。
 
 ### 5) 会话记忆链路
 1. 每轮问答按当前登录用户 + `session_id` 写入 PostgreSQL。
@@ -293,19 +296,21 @@ uv run --directory backend uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ## 技术栈
 - 后端：FastAPI、LangChain Agents、Pydantic、Uvicorn、SQLAlchemy、PostgreSQL、Redis。
 - 向量与检索：Milvus（HNSW 稠密索引 + SPARSE_INVERTED_INDEX 稀疏索引）、RRF 融合、Jina Rerank 精排。
-- 嵌入与稀疏：`langchain_huggingface` 本地稠密向量（默认 `BAAI/bge-m3`）；Milvus 2.6 BM25 Function 自动生成稀疏向量。
-- 前端：Vue 3 (CDN)、marked、highlight.js、纯静态部署。
+- 嵌入与稀疏：`langchain_huggingface` 本地稠密向量（默认 `BAAI/bge-m3`）；中英混合规则分词 + BM25 手写稀疏向量，统计持久化至 `bm25_state.json`。
+- 前端：Vite + Vue 3 (SFC) + TypeScript + Pinia + Axios + Marked + Highlight.js + FontAwesome，工程化编译与静态文件托管。
 - 工具链：dotenv 配置、requests、langchain_text_splitters、langchain_community.loaders。
 
 ## 环境变量
 需在仓库根目录或运行环境配置：
 - 模型相关：`ARK_API_KEY`、`MODEL`、`BASE_URL`
 - 稠密向量：`EMBEDDING_MODEL`、`EMBEDDING_DEVICE`、`DENSE_EMBEDDING_DIM`（需与 Milvus 集合 `dense_embedding` 维度一致）
+- BM25 持久化：`BM25_STATE_PATH`（可选，默认 `data/bm25_state.json`）
 - Rerank 相关：`RERANK_MODEL`、`RERANK_BINDING_HOST`、`RERANK_API_KEY`
 - Milvus：`MILVUS_HOST`、`MILVUS_PORT`、`MILVUS_COLLECTION`
 - 数据库缓存：`DATABASE_URL`、`REDIS_URL`
 - 鉴权相关：`JWT_SECRET_KEY`、`ADMIN_INVITE_CODE`、`JWT_ALGORITHM`、`JWT_EXPIRE_MINUTES`
 - 密码参数：`PASSWORD_PBKDF2_ROUNDS`
+- 检索候选池：`RETRIEVAL_CANDIDATE_K`（固定候选数，优先）、`RETRIEVAL_CANDIDATE_MULTIPLIER`（未设 K 时 `max(top_k × 倍数, top_k)`，默认 `3`）
 - Auto-merging：`AUTO_MERGE_ENABLED`、`AUTO_MERGE_THRESHOLD`、`LEAF_RETRIEVE_LEVEL`
 - 工具：`AMAP_WEATHER_API`、`AMAP_API_KEY`
 
@@ -363,12 +368,12 @@ def emit_rag_step(icon, label):
 ```
 
 ### 2. 混合检索（Hybrid Search）深度实现
-项目并非简单调用 Milvus 接口，而是构建了稀疏-稠密双塔检索：
+项目并非简单调用 Milvus 接口，而是手动构建了稀疏-稠密双塔检索：
 
 - **Dense Pathway**：使用 `langchain_huggingface.HuggingFaceEmbeddings`（默认 `BAAI/bge-m3`）生成稠密向量，维度由 `DENSE_EMBEDDING_DIM` 与集合 schema 对齐（默认 1024），向量可做 L2 归一化后与 Milvus `IP` 度量配合。
 - **Sparse Pathway**：
-    - 在 Milvus schema 中声明 BM25 Function：输入 `text`，输出 `sparse_embedding`。
-    - Milvus 维护词表、`doc_freq`、文档数与 BM25 分数；检索时 sparse 分支直接传入 query 文本。
+    - 在 `embedding.py` 中基于中英混合规则分词（单字中文 + 英文单词）实现 BM25，生成 `{稀疏维度下标: BM25 分数}`，写入 Milvus `SPARSE_FLOAT_VECTOR`。
+    - 全局 `N` / `doc_freq` / 平均文档长等统计持久化在 `bm25_state.json`，入库与删除走增量更新；检索与写入共用同一 `embedding_service` 单例。
 - **Milvus 融合**：
     - 使用 Milvus 的 `AnnSearchRequest` 同时发起两个请求。
     - **RRFRanker (Reciprocal Rank Fusion)**: 采用 `k=60` 的倒数排名融合算法，将两路召回结果无参数化地合并，避免了加权求和中调节 `alpha` 参数的困难。
@@ -482,15 +487,11 @@ StreamingResponse(
 
 ## 更新日志
 
-### 2026-06-01 Milvus 2.6 内置 BM25 改造
-- **BM25 迁移到 Milvus**：collection schema 新增 `text -> sparse_embedding` 的 BM25 Function，应用层不再维护 `bm25_state.json`。
-- **写入链路简化**：入库时只生成并写入 `dense_embedding` 与原文 `text`，`sparse_embedding` 由 Milvus 服务端自动生成。
-- **检索链路调整**：Hybrid Search 的 sparse 分支传入 query 文本，由 Milvus 执行 BM25 查询；dense 分支仍使用本地 `BAAI/bge-m3`。
-- **注意**：旧 collection 不包含 BM25 Function，需删除/重建 collection 并重新上传文档。
-
 ### 2026-05-31 本地嵌入与 BM25 持久化
 - **稠密向量**：由兼容 API 改为 `langchain_huggingface` 本地模型（默认 `BAAI/bge-m3`），支持 `EMBEDDING_MODEL` / `EMBEDDING_DEVICE`；Milvus `dense_embedding` 维度与 `DENSE_EMBEDDING_DIM` 对齐（默认 1024）。
-- **历史说明**：这一版曾在应用层维护 BM25 统计；2026-06-01 已迁移到 Milvus 2.6 BM25 Function。
+- **BM25 统计**：`词表 vocab + 文档频次 doc_freq + 文档数 N` 持久化至 `data/bm25_state.json`（可选 `BM25_STATE_PATH`）；每个叶子 chunk 视为一篇文档，入库时 **increment_add**，删除文档或覆盖上传前按文件名从 Milvus 拉取 chunk 文本后 **increment_remove**；`embedding_service` 在 `api` 与 `rag_utils` 间单例共享，避免写入与检索状态分裂。
+- **Milvus 查询**：单次 `query` 的 `limit` 受服务端窗口限制（如 16384），新增 **`query_all`** 分页拉取，供删除/覆盖前取回全文以同步 BM25；修复单次 `limit=100000` 导致的 RPC 报错。
+- **说明**：README「环境变量」「文档入库」「混合检索」「数据目录」等已同步为上述行为；`data/` 下 `bm25_state.json` 通常被 git 忽略，空库仅有 Milvus 无状态文件时需自行重建或重导。
 
 ### 2026-05-21 后端服务建设升级（认证 + 数据库 + 缓存）
 - 新增认证与权限模块：注册、登录、JWT、管理员权限控制。
@@ -515,3 +516,4 @@ StreamingResponse(
   2. **Backend (`tools.py`)**：更新 `emit_rag_step` 使用捕获的 `_RAG_STEP_LOOP.call_soon_threadsafe` 跨线程调度事件。
   3. **Frontend (`script.js`)**：在发送消息时初始化空的 `ragSteps: []` 数组，确保 Vue 响应式系统能立即追踪后续的 push 操作。
 - **效果**：用户提问后，思考气泡内实时跳动显示检索步骤（如"🔍 正在检索知识库..." -> "📊 正在评估文档相关性..."），不再只有静态的"正在思考中..."。
+

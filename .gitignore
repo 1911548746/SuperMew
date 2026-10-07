@@ -20,4 +20,6 @@ data/
 # test
 tests/
 
+.idea
+
 AGENTS.md
