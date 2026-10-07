@@ -1,10 +1,6 @@
-"""文本向量化服务 - 负责本地密集向量；BM25 稀疏向量由 Milvus 2.6 内置 Function 生成。"""
+"""文本向量化服务 - 只支持密集向量（由 Milvus 2.5+ 原生支持中文分词与 BM25 全文检索）"""
 import os
-
-from dotenv import load_dotenv
 from langchain_huggingface import HuggingFaceEmbeddings
-
-load_dotenv()
 
 
 def _create_dense_embedder() -> HuggingFaceEmbeddings:
@@ -18,13 +14,9 @@ def _create_dense_embedder() -> HuggingFaceEmbeddings:
 
 
 class EmbeddingService:
-    """文本向量化服务 - 仅负责密集向量。
+    """文本向量化服务 - 密集向量本地模型"""
 
-    稀疏 BM25 不再由应用层维护 vocab / df / N / avg_doc_len，而是交给 Milvus
-    collection schema 上的 BM25 Function 根据 text 字段自动生成。
-    """
-
-    def __init__(self):
+    def __init__(self, state_path=None):
         self._embedder = _create_dense_embedder()
 
     def get_embeddings(self, texts: list[str]) -> list[list[float]]:
@@ -33,8 +25,8 @@ class EmbeddingService:
         try:
             return self._embedder.embed_documents(texts)
         except Exception as e:
-            raise Exception(f"本地嵌入模型调用失败: {str(e)}") from e
+            raise Exception(f"本地密集嵌入模型调用失败: {str(e)}") from e
 
 
-# 全进程唯一实例：写入与检索共用同一个本地 dense embedding 模型实例
+# 全进程唯一实例
 embedding_service = EmbeddingService()
